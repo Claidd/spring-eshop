@@ -5,7 +5,9 @@
     <title>Demo Shop</title>
 </head>
 <body>
-    <a th:href="@{/users/new}">Users</a>
-    <a th:href="@{/login}">Login</a>
+    <div th:insert="~{fragments/menu :: #nav-menu}"></div>
+
+<h2>кол-во кликов - > <b th:text="${amountClicks}">10</b></h2>
+<h2>Ваш UUID -> <b th:text="${uuid}">10</b></h2>
 </body>
 </html>

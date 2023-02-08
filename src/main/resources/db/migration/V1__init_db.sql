@@ -12,7 +12,7 @@ create table orders (id bigint not null, address varchar(255), created timestamp
 create table orders_details (order_id bigint not null, details_id bigint not null);
 create table products (id bigint not null, price numeric(38,2), title varchar(255), primary key (id));
 create table products_categories (product_id bigint not null, category_id bigint not null);
-create table users (id bigint not null, archive boolean not null, email varchar(255), name varchar(255), password varchar(255), role varchar(255), bucket_id bigint, primary key (id));
+create table users (id bigint not null, archive boolean not null, email varchar(255), name varchar(255), password varchar(255), role varchar(255), primary key (id));
 alter table if exists orders_details add constraint order_details_fk unique (details_id);
 alter table if exists buckets add constraint buckets_user_fk foreign key (user_id) references users;
 alter table if exists buckets_products add constraint buckets_products_fk foreign key (product_id) references products;
@@ -24,7 +24,7 @@ alter table if exists orders_details add constraint orders_details_fk foreign ke
 alter table if exists orders_details add constraint orders_order_fk foreign key (order_id) references orders;
 alter table if exists products_categories add constraint products_category_fk foreign key (category_id) references category;
 alter table if exists products_categories add constraint products_product_fk foreign key (product_id) references products;
-alter table if exists users add constraint users_bucket_fk foreign key (bucket_id) references buckets;
+
 
 
 

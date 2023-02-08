@@ -5,6 +5,9 @@
   <title>Login Page</title>
 </head>
 <body>
+<div th:insert="~{fragments/menu :: #nav-menu}"></div>
+
+<p th:if="${loginError}" class="error">Не верный логин или пароль</p>
 <form th:action="@{/auth}" method="post">
   <table border="1">
     <tr>

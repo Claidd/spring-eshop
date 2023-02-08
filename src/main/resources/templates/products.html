@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Список товаров</title>
+</head>
+<body>
+<div th:insert="~{fragments/menu :: #nav-menu}"></div>
+
+<table border="1", align="center">
+    <tr>
+        <td>Название</td>
+        <td>Цена</td>
+        <td></td>
+    </tr>
+    <tr th:each="product : ${products}">
+        <td th:text="${product.title}">Гарри Поттер</td>
+        <td th:text="${product.price}">1000.00</td>
+        <!--Добавляем ссылку на добавление нового товара в корзинку, указывая, что id это id продукта -->
+        <td><a th:href="@{/products/{id}/bucket(id=${product.id})}">Добавить в корзину</a></td>
+    </tr>
+</table>
+</body>
+</html>

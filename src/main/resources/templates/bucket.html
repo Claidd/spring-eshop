@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Корзина</title>
+</head>
+<body>
+<div th:insert="~{fragments/menu :: #nav-menu}"></div>
+<h2>Ваша корзина:</h2>
+<h3>На общую стоимость: -> <b th:text="${bucket.sum}">1000</b> </h3>
+
+<table border="1" align="center">
+  <tr>
+    <td>Товар</td>
+    <td>Количество</td>
+    <td>Цена</td>
+    <td>Сумма</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr th:each="detail : ${bucket.bucketDetails}">
+    <td th:text="${detail.title}">Гарри</td>
+    <td th:text="${detail.amount}">2</td>
+    <td th:text="${detail.price}">1000</td>
+    <td th:text="${detail.sum}">2000</td>
+    <td> <a href="#">Удалить</a></td>
+    <td><a th:href="@{/bucket/{title}/delete(title=${detail.title})}">Удалить</a></td>
+  </tr>
+</table>
+</body>
+</html>
