@@ -4,12 +4,11 @@ import com.hunt.springeshop.domain.User;
 import com.hunt.springeshop.dto.UserDTO;
 import com.hunt.springeshop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.Objects;
 
@@ -30,11 +29,27 @@ public class UserController {
     }
 
     @GetMapping("/new")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    /*Назначаем права доступа только для пользователей с ролью админов*/
     public String newUser(Model model) {
+        System.out.println("Вызов метода нью юзер");
         model.addAttribute("user", new UserDTO());
         return "user";
     }
 
+    /*проверяем аутентификацию. Берем текущее имя и имя принципал*/
+    @PostAuthorize("isAuthenticated() and #username == authentication.principal.username")
+    @GetMapping("/{name}/roles")
+    @ResponseBody
+    public String getRoles(@PathVariable ("name") String username){
+        System.out.println("Вызов метода getRoles");
+        /*Мы выделяем запросы, которые позвонляют обратиться к поиску ролей текущег опользователя, ко всем
+        * аутифицированным, у которых логин пользователя равен самому пользователю. Через эту ссылку даже админ не сможет
+        * посмотреть роль пользователя через ссылку страницы, но при этом можем позволять все что угодно если добавлять методы соотв
+        *  */
+        User byName = userService.findByName(username);
+        return byName.getRole().name();
+    }
     @PostMapping("/new")
     public String saveUser(UserDTO dto, Model model) {
         if (userService.save(dto)) {
@@ -82,3 +97,5 @@ public class UserController {
 
 
 }
+/*Задание добавить вызовы аоп, которые будут логировать вызовы любого контроллера, сделать страницу
+* куда будет выводиться лог*/

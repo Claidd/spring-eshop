@@ -20,7 +20,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, jsr250Enabled = true)
+/*prePostEnabled = true, jsr250Enabled = true уберают логику  в конфиге некоторых условий ( у данной ссылки есть доступ у админа)*/
 public class SecurityConfig {
 
     private  UserService userService;
@@ -61,7 +62,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .requestMatchers("/users").hasAnyAuthority(Role.ADMIN.name(), Role.MANAGER.name())
-                .requestMatchers("/users/new").hasAuthority(Role.ADMIN.name())
+//                .requestMatchers("/users/new").hasAuthority(Role.ADMIN.name())
                 .anyRequest().permitAll()
                 .and()
                     .formLogin()
