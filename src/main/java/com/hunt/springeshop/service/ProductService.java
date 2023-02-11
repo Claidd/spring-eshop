@@ -11,4 +11,5 @@ public interface ProductService {
     Product findByTitle(String title);
     void addToUserBucket(Long productId, String username);
     void removeToUserBucket(Long productId, String username);
+    void addProduct(ProductDTO dto);
 }

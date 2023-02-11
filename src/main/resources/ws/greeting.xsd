@@ -1,0 +1,32 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://hunt.com/springeshop/ws/greeting"
+           targetNamespace="http://hunt.com/springeshop/ws/greeting"
+           elementFormDefault="qualified">
+    <!-- Схема для будущего джава кода. Все идет снизу вверх ниже будет определенный гетер-->
+    <!--3. У нас будет запрос-->
+    <xs:element name="getGreetingRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name ="name" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--2. У нас будет какой-то ответ -->
+    <xs:element name="getGreetingResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="greeting" type="tns:greeting"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--1. У нас появляется некий класс приветствие, в нем будут стринга внутри и дата.-->
+    <xs:complexType name="greeting">
+        <xs:sequence>
+            <xs:element name="text" type="xs:string"/>
+            <xs:element name="date" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

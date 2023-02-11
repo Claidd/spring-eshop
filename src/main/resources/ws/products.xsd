@@ -1,0 +1,31 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://hunt.com/springeshop/ws/products"
+           targetNamespace="http://hunt.com/springeshop/ws/products"
+           elementFormDefault="qualified">
+    <!-- Схема для будущего джава кода. Все идет снизу вверх ниже будет определенный гетер-->
+    <!--3. У нас будет запрос-->
+    <xs:element name="getProductsRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <!--2. У нас будет какой-то ответ -->
+    <xs:element name="getProductsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="products" type="tns:productsWS" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--1. У нас появляется некий класс приветствие, в нем будут стринга внутри и дата.-->
+    <xs:complexType name="productsWS">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="price" type="xs:double"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

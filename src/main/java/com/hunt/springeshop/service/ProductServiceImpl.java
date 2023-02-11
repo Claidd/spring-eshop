@@ -6,7 +6,7 @@ import com.hunt.springeshop.domain.Product;
 import com.hunt.springeshop.domain.User;
 import com.hunt.springeshop.dto.ProductDTO;
 import com.hunt.springeshop.mapper.ProductMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +22,13 @@ public class ProductServiceImpl implements ProductService{
     private final UserService userService;
 
     private final BucketService bucketService;
+    private final SimpMessagingTemplate template;
 
-    public ProductServiceImpl(ProductRepository productRepository, UserService userService, BucketService bucketService) {
+    public ProductServiceImpl(ProductRepository productRepository, UserService userService, BucketService bucketService, SimpMessagingTemplate template) {
         this.productRepository = productRepository;
         this.userService = userService;
         this.bucketService = bucketService;
+        this.template = template;
     }
 
 
@@ -95,6 +97,16 @@ public class ProductServiceImpl implements ProductService{
              * и предаем в него корзину пользователя и список из одного элемента с id продукта*/
             bucketService.removeProduct(bucket, Collections.singletonList(productId));
         }
+    }
+
+    @Override
+    @Transactional
+    public void addProduct(ProductDTO dto){
+        Product product = mapper.toProduct(dto);
+        Product saveProduct = productRepository.save(product);
+        /*Будем отправлять все в топик продукты*/
+        /*Активизируем метод по которому все кто подписан на данный топик будут получать эту информацию*/
+        template.convertAndSend("/topic/products", ProductMapper.MAPPER.fromProduct(saveProduct));
     }
 
 
