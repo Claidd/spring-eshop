@@ -27,5 +27,8 @@
     <td><a th:href="@{/bucket/{title}/delete(title=${detail.title})}">Удалить</a></td>
   </tr>
 </table>
+<form th:action="@{/bucket}" method="post">
+  <button type="submit">Сделать заказ</button>
+</form>
 </body>
 </html>

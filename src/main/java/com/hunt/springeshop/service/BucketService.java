@@ -14,4 +14,6 @@ public interface BucketService {
     void removeProduct(Bucket bucket, List<Long> productIds);
 
     BucketDTO getBucketByUser(String name);
+
+    void commitBucketToOrder(String username);
 }

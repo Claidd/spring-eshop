@@ -32,4 +32,9 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
     private Bucket bucket;
+    /*Как только мы добавляем юзера у нас сразу же в бд будет код активации. Он будет отправлен по мейлу
+    * в случае если отправка успешная, то у юзера в графе активат код будет код. Как юзер подверждает на почте активацию
+    * данный активационный код будет уходить у нас из БД, останется null*/
+    @Column(name = "activate_code", length = 80)
+    private String activateCode;
 }

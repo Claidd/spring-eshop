@@ -7,6 +7,7 @@
 <body>
 <div th:insert="~{fragments/menu :: #nav-menu}"></div>
 <h1>Профайл пользователя</h1>
+<p th:if="${!user.activated}">Вы не активированны!</p>
 <form th:action="@{/users/profile}" th:object="${user}" method="post">
 <table border="1">
     <tr>

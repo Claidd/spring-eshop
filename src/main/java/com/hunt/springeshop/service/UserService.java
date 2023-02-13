@@ -14,4 +14,6 @@ public interface UserService extends UserDetailsService {// security
     User findByName(String name);
 
     void updateProfile(UserDTO userDTO);
+
+    boolean activateUser(String activateCode);
 }

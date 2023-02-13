@@ -2,9 +2,7 @@ package com.hunt.springeshop.service;
 
 import com.hunt.springeshop.dao.BucketRepository;
 import com.hunt.springeshop.dao.ProductRepository;
-import com.hunt.springeshop.domain.Bucket;
-import com.hunt.springeshop.domain.Product;
-import com.hunt.springeshop.domain.User;
+import com.hunt.springeshop.domain.*;
 import com.hunt.springeshop.dto.BucketDTO;
 import com.hunt.springeshop.dto.BucketDetailDTO;
 import org.springframework.stereotype.Service;
@@ -22,10 +20,13 @@ public class BucketServiceImpl implements BucketService{
     private final ProductRepository productRepository;
     private final UserService userService;
 
-    public BucketServiceImpl(BucketRepository bucketRepository, ProductRepository productRepository, UserService userService) {
+    private final OrderService orderService;
+
+    public BucketServiceImpl(BucketRepository bucketRepository, ProductRepository productRepository, UserService userService, OrderService orderService) {
         this.bucketRepository = bucketRepository;
         this.productRepository = productRepository;
         this.userService = userService;
+        this.orderService = orderService;
     }
 
 
@@ -132,4 +133,56 @@ public class BucketServiceImpl implements BucketService{
         bucketDTO.aggregate();
         return bucketDTO;
     }
+
+    @Override
+    @Transactional
+    public void commitBucketToOrder(String username){
+        /*Ищем нашего юзера в БД по имени и берем его*/
+        User user = userService.findByName(username);
+        /*Проверяем юзера на нал, друг его не оказалось и юзеру присвоилась ссылка на нал*/
+        if  (user == null){
+            throw new RuntimeException("Пользователь не найден");
+        }
+        /*Берем карзину наденного нами юзера*/
+        Bucket bucket = user.getBucket();
+        /*Проверяем есть ли корзина и не пустая ли она. Если да то смысла что-то делать нет, возвращаемся*/
+        if  (bucket == null || bucket.getProducts().isEmpty()){
+            return;
+        }
+
+        /*Создаем новый заказ*/
+        Order order = new Order();
+        /*Устанавливаем статус заказа как новый*/
+        order.setStatus(OrderStatus.NEW);
+        /*Закрепляем за заказом юзера сделавшего заказ*/
+        order.setUser(user);
+
+        /*Пытаемся взять все кол-во наших продуктов из корзины и сгруппировать их*/
+        Map<Product, Long> productWithAmount = bucket.getProducts().stream()
+                .collect(Collectors.groupingBy(product -> product, Collectors.counting()));
+
+        /**/
+        List<OrderDetail> orderDetails = productWithAmount.entrySet().stream()
+                .map(pair -> new OrderDetail(order, pair.getKey(), pair.getValue()))
+                .collect(Collectors.toList());
+
+        BigDecimal total = new BigDecimal(orderDetails.stream()
+                .map(orderDetail -> orderDetail.getPrice().multiply(orderDetail.getAmount()))
+                        .mapToDouble(BigDecimal::doubleValue).sum());
+
+        /*передаем детали заказа и сумму, адрес пока пустой*/
+        order.setDetails(orderDetails);
+        order.setSum(total);
+        order.setAddress("none");
+
+        /*Сохраняем все*/
+        orderService.saveOrder(order);
+        /*Очищаем корзинку*/
+        bucket.getProducts().clear();
+        /*Сохраняем очищенную корзинку*/
+        bucketRepository.save(bucket);
+
+    }
+
+
 }

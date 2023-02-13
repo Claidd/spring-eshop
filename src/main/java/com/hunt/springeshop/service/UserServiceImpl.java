@@ -4,17 +4,18 @@ import com.hunt.springeshop.dao.UserRepository;
 import com.hunt.springeshop.domain.Role;
 import com.hunt.springeshop.domain.User;
 import com.hunt.springeshop.dto.UserDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -23,15 +24,18 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MailSenderService mailSenderService;
 
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, MailSenderService mailSenderService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.mailSenderService = mailSenderService;
     }
 
 
     @Override
+    @Transactional
     public boolean save(UserDTO userDTO) {
         if(!Objects.equals(userDTO.getPassword(), userDTO.getMatchingPassword())){
             throw new RuntimeException("Password is not equsals");
@@ -41,14 +45,20 @@ public class UserServiceImpl implements UserService{
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .email(userDTO.getEmail())
                 .role(Role.CLIENT)
+                /*добавляем рандомный активационный код пользователю*/
+                .activateCode(UUID.randomUUID().toString())
                 .build();
-        userRepository.save(user);
+        this.save(user);
         return true;
     }
 
     @Override
+    @Transactional
     public void save(User user) {
         userRepository.save(user);
+        if(user.getActivateCode() != null && !user.getActivateCode().isEmpty()){
+            mailSenderService.sendActivateCode(user);
+        }
     }
 
     @Override
@@ -57,8 +67,6 @@ public class UserServiceImpl implements UserService{
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
-
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -110,5 +118,22 @@ public class UserServiceImpl implements UserService{
             if  (isChanged){
                 userRepository.save(saveUser);
             }
+    }
+
+    @Override
+    @Transactional
+    public boolean activateUser(String activateCode) {
+        if(activateCode == null || activateCode.isEmpty()){
+            return false;
+        }
+        User user = userRepository.findFirstByactivateCode(activateCode);
+        if(user == null){
+            return false;
+        }
+
+        user.setActivateCode("Active");
+        userRepository.save(user);
+
+        return true;
     }
 }

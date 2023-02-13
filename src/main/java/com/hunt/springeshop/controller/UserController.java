@@ -95,7 +95,12 @@ public class UserController {
         return "profile";
     }
 
-
+    @GetMapping("/activate/{code}")
+    public String activateUser(Model model,@PathVariable("code") String activateCode){
+        boolean activated = userService.activateUser(activateCode);
+        model.addAttribute("activated", activated);
+        return "activate-user";
+    }
 }
 /*Задание добавить вызовы аоп, которые будут логировать вызовы любого контроллера, сделать страницу
 * куда будет выводиться лог*/

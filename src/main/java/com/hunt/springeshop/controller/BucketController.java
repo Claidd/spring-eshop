@@ -36,6 +36,16 @@ public class BucketController {
         return "bucket";
     }
 
+    /*Как только мы переходим на бакеет, мы передаем сюда пользователя*/
+    @PostMapping("/bucket")
+    public String commitBucket(Principal principal){
+        if  (principal != null){
+            bucketService.commitBucketToOrder(principal.getName());
+        }
+        return "redirect:/bucket";
+    }
+
+
     @GetMapping("/bucket/{title}/delete")
     public String deleteBucket(@PathVariable String title, Principal principal){
         System.out.println(title);
