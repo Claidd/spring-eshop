@@ -16,7 +16,7 @@
 
     <int-http:outbound-channel-adapter
             id="ordersAdapter"
-            url="http://localhost:8080/bucket"
+            url="http://localhost:9090/bucket"
             http-method="POST"
             charset="UTF-8"
             channel="ordersChannel">
